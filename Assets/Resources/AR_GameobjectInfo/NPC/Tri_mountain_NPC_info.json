@@ -1,0 +1,15 @@
+{
+    "NPC_info": [
+        {
+            "black_bear":{
+                "name": "black bear",
+                "position": ["25.05","121"],
+                "prefab_name": "black_bear",
+                "conversation_text_path": ""
+            }
+        },
+        {
+
+        }
+    ]
+}

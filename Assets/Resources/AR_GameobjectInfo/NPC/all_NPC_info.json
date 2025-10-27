@@ -1,0 +1,15 @@
+{
+    "NPC_info": [
+        {
+            "black_bear":{
+                "name": "Black Bear",
+                "position": ["25.05","121"],
+                "prefab_name": "black_bear",
+                "quest_cnt": 1
+            }
+        },
+        {
+
+        }
+    ]
+}

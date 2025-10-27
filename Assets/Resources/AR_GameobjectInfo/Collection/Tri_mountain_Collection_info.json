@@ -1,0 +1,14 @@
+{
+    "collection_info": [
+        {
+            "name": "black_bear",
+            "position": ["25.05","121"],
+            "is_collected": "false"
+        },
+        {
+            "name": "coin",
+            "position": ["25.05","121"],
+            "is_collected": "false"
+        }
+    ]
+}

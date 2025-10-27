@@ -1,0 +1,18 @@
+{
+    "AR_gameobjects_info": [{
+        "default_region": [
+            {
+                "name": "black_bear",
+                "position": ["25.05","121"],
+                "is_collected": "false"
+            },
+            {
+                "name": "coin",
+                "position": ["25.05","121"],
+                "is_collected": "false"
+            }
+        ],
+        "Taipei": [],
+        "Taoyuan": []
+    }]
+}
