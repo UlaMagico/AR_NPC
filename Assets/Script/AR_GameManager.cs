@@ -5,10 +5,6 @@ using UnityEngine.UI;
 
 public class AR_GameManager : MonoBehaviour
 {
-    //some path-----------------------------------------
-    readonly string ARGameObjectInfodir = "AR_GameObjectInfo"; //for reading info like location or isCollected
-    readonly string ARGameObjectDir = "AR_GameObject";
-
     //for AR and location--------------------------------
     public double visiableDistance = 0.02; //收集物件的可見範圍(km)
     public double destroyDistance = 0.03; //收集物件超過此範圍(km)則移除
@@ -18,15 +14,11 @@ public class AR_GameManager : MonoBehaviour
     public Camera mainCamera;
 
     //NPC info --------------------------------
-    private string NPCName = "Black bear";
-    private string NPCNameInFile = "black_bear";
-    [SerializeField] private GameObject NPCPrefab;
-    private Vector2 NPCLocation = new(1, 1); //NPC location in real world
-    private int taskCnt = 1;
-    private string conversationTextPath = "Conversation/black_bear_Q1";
+    //TODO:想辦法在特定區域加載NPC,暫時自己放
+    public ScriptableNPC NPC;
 
     // for conversation----------------------------
-    private ConversationSystem conversationSystem = new ConversationSystem();
+    [SerializeField] private DialogSystem dialogSystem;
 
     //in AR---------------------------------------
     private GameObject spawnedNPC;
@@ -51,19 +43,17 @@ public class AR_GameManager : MonoBehaviour
     void Start()
     {
         playerLocation = playerLocationManager.GetPlayerLocation();
-        string path;
-        if (taskCnt>0)
+        if (NPC.taskCnt > 0)
         {
-            path = ARGameObjectDir + "/NPC/Quest_" + NPCNameInFile;        
+            //顯示任務符號
+            NPC.showTaskSign();
         }
         else
         {
-            path = ARGameObjectDir + "/NPC/" + NPCNameInFile;
+            //不顯示符號
+            NPC.hideTaskSign();
         }
 
-        if(NPCPrefab == null) Debug.Log("cannot load NPC prefab: \"" + path + "\"");
-        
-        NPCPrefab = Resources.Load<GameObject>(path);
         updateActButton();
     }
 
@@ -75,7 +65,7 @@ public class AR_GameManager : MonoBehaviour
 
         double distance = locationCalculator.distance(
             playerLocation[0], playerLocation[1],
-            NPCLocation[0], NPCLocation[1]
+            NPC.location[0], NPC.location[1]
         );
 
         isVisible = distance < visiableDistance;
@@ -83,7 +73,7 @@ public class AR_GameManager : MonoBehaviour
         //set AR NPC act---------------------------------------------
         actButtonMod = 1; //default is call
         string ARGameInfo = "";
-        if (NPCPrefab != null)
+        if (NPC.prefab != null)
         {
             if (isVisible)
             {
@@ -111,13 +101,8 @@ public class AR_GameManager : MonoBehaviour
                 ARGameInfo = "There's NPC in this area\n"
                            + "It's " + (distance * 1000).ToString("f2") + "m away from you!";
             }
-            Debug.Log("Distance: " + distance);
-
         }
-        else
-        {
-            ARGameInfo = "No NPC in this area";
-        }
+        else ARGameInfo = "No NPC in this area";
 
         ARGameInfoText.text = ARGameInfo;
         updateActButton();
@@ -127,7 +112,7 @@ public class AR_GameManager : MonoBehaviour
     {
         if (spawnedNPC == null)
         {
-            spawnedNPC = Instantiate(NPCPrefab, spawnPoint, new Quaternion(0, 90, 0, 0));
+            spawnedNPC = Instantiate(NPC.prefab, spawnPoint, new Quaternion(0, 90, 0, 0));
         }
     }
 
@@ -138,13 +123,6 @@ public class AR_GameManager : MonoBehaviour
             Destroy(spawnedNPC);
             spawnedNPC = null;
         }
-    }
-
-    //用來切換目前準備生成的NPC或收集物件
-    void setNPCPrefab(GameObject gameObject)
-    {
-        destroyGameObject();
-        NPCPrefab = gameObject;
     }
 
     //將NPC呼叫(移動)至面前，預防生成再奇怪的地方
@@ -168,11 +146,16 @@ public class AR_GameManager : MonoBehaviour
     [System.Obsolete]
     public void talkToNPC()
     {
+        /*
         if (!conversationBlock.active) conversationBlock.SetActive(true);
         else conversationBlock.SetActive(false);
+        */
+        string sourceTextPath = "Task/test_NPC_task_1.txt";
+        dialogSystem.generateDialog(NPC, sourceTextPath);
     }
 
     //判斷NPC是否在相機範圍內
+    //TODO:將範圍縮小至中間
     public bool isNPCInCamera()
     {
         if (spawnedNPC != null)
